@@ -20,5 +20,7 @@ namespace MetricsExtractor
         public string[] IgnoredTypes { get; set; }
 
         public string destinationReportPath { get; set; }
+
+        public bool? openReport { get; set; }
     }
 }
