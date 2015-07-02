@@ -19,6 +19,6 @@ namespace MetricsExtractor
 
         public string[] IgnoredTypes { get; set; }
 
-        public string destinationReportFolder { get; set; }
+        public string destinationReportPath { get; set; }
     }
 }

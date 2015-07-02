@@ -30,8 +30,8 @@ namespace MetricsExtractor
 
             var metricConfiguration = DashedParameterSerializer.Deserialize<MetricConfiguration>(args);
 
-            if(metricConfiguration.destinationReportFolder != null && !Directory.Exists(metricConfiguration.destinationReportFolder))
-                throw new DirectoryNotFoundException("Destination Report Folder not found.");    
+            if(metricConfiguration.destinationReportPath != null && !Directory.Exists(metricConfiguration.destinationReportPath))
+                throw new DirectoryNotFoundException("Destination Report Path not found.");    
 
             var runCodeMetrics = RunCodeMetrics(metricConfiguration);
             runCodeMetrics.Wait();
@@ -49,7 +49,7 @@ namespace MetricsExtractor
 
             var resultadoGeral = CreateEstadoDoProjeto(types, metodosRuins, metodos.Count, namespaceMetrics);
 
-            var reportPath = GenerateReport(resultadoGeral, metricConfiguration.destinationReportFolder ?? metricConfiguration.SolutionDirectory);
+            var reportPath = GenerateReport(resultadoGeral, metricConfiguration.destinationReportPath ?? metricConfiguration.SolutionDirectory);
 
             Console.WriteLine("Report generated in: {0}", reportPath);
 #if DEBUG
