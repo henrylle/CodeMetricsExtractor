@@ -18,5 +18,7 @@ namespace MetricsExtractor
         public string[] IgnoredNamespaces { get; set; }
 
         public string[] IgnoredTypes { get; set; }
+
+        public string destinationReportFolder { get; set; }
     }
 }

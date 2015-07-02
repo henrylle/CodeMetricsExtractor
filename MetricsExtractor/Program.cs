@@ -30,6 +30,9 @@ namespace MetricsExtractor
 
             var metricConfiguration = DashedParameterSerializer.Deserialize<MetricConfiguration>(args);
 
+            if(metricConfiguration.destinationReportFolder != null && !Directory.Exists(metricConfiguration.destinationReportFolder))
+                throw new DirectoryNotFoundException("Destination Report Folder not found.");    
+
             var runCodeMetrics = RunCodeMetrics(metricConfiguration);
             runCodeMetrics.Wait();
             Console.WriteLine("All projects measure, creating report");
@@ -42,11 +45,11 @@ namespace MetricsExtractor
 
             var metodos = types.SelectMany(x => x.MemberMetrics, (type, member) => new MetodoComTipo { Tipo = type, Metodo = member }).ToList();
 
-            var metodosRuins = GetMetodosRuins(metodos, MAX_LINES_OF_CODE_ON_METHOD);
+            var metodosRuins = GetBadMethods(metodos, MAX_LINES_OF_CODE_ON_METHOD);
 
             var resultadoGeral = CreateEstadoDoProjeto(types, metodosRuins, metodos.Count, namespaceMetrics);
 
-            var reportPath = GenerateReport(resultadoGeral, metricConfiguration.SolutionDirectory);
+            var reportPath = GenerateReport(resultadoGeral, metricConfiguration.destinationReportFolder ?? metricConfiguration.SolutionDirectory);
 
             Console.WriteLine("Report generated in: {0}", reportPath);
 #if DEBUG
@@ -112,7 +115,7 @@ namespace MetricsExtractor
             return resultadoGeral;
         }
 
-        private static List<MetodoRuim> GetMetodosRuins(List<MetodoComTipo> metodos, int maxLinesOfCodeOnMethod)
+        private static List<MetodoRuim> GetBadMethods(List<MetodoComTipo> metodos, int maxLinesOfCodeOnMethod)
         {
             var metodosRuins = metodos
                 .Where(x => (x.Metodo.SourceLinesOfCode >= maxLinesOfCodeOnMethod) || (x.Metodo.CyclomaticComplexity >= 10))
