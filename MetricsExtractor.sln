@@ -20,6 +20,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiMetrics.Common", "Arch
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "MetricsExtractorInstaller", "MetricsExtractorInstaller\MetricsExtractorInstaller.vdproj", "{85A66A6B-BCD8-40E1-9E09-975E62FF880F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetricsExtractor.Core", "MetricsExtractor.Core\MetricsExtractor.Core.csproj", "{03F3B331-B1CB-4627-8165-1B548E00C78A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +46,10 @@ Global
 		{D8BE9D36-EC03-4EEE-91DA-F9D8C9FD11D2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{85A66A6B-BCD8-40E1-9E09-975E62FF880F}.Debug|Any CPU.ActiveCfg = Debug
 		{85A66A6B-BCD8-40E1-9E09-975E62FF880F}.Release|Any CPU.ActiveCfg = Release
+		{03F3B331-B1CB-4627-8165-1B548E00C78A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03F3B331-B1CB-4627-8165-1B548E00C78A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03F3B331-B1CB-4627-8165-1B548E00C78A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03F3B331-B1CB-4627-8165-1B548E00C78A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

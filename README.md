@@ -56,3 +56,22 @@ Example:
 ````
 metricsextractor.exe -solution solutionpath.sln -ignoredtypes "Namespace.Core.Person;Namespace.Data.UnitOfWork"
 ````
+
+#### DestinationReportPath (*New*)
+You can change default destination to report. You must split them by "**;**"
+
+Example:
+
+````
+metricsextractor.exe -solution solutionpath.sln -destinationreportpath "C:\Reports"
+````
+
+#### OpenReport (*New*)
+
+You can set to report open on your default browser after finish. Default is ***false**. You must split them by "**;**"
+
+Example:
+
+````
+metricsextractor.exe -solution solutionpath.sln -openreport "true"
+````

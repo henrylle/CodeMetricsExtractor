@@ -19,8 +19,18 @@ namespace MetricsExtractor
 
         public string[] IgnoredTypes { get; set; }
 
-        public string destinationReportPath { get; set; }
+        public string DestinationReportPath { get; set; }
 
-        public bool? openReport { get; set; }
+        public bool? OpenReport { get; set; }
+
+        public bool? SendToS3 { get; set; }
+
+        public string  AwsAccessKey { get; set; }
+
+        public string AwsSecretKey { get; set; }
+
+        public string BucketS3 { get; set; }
+
+        public string PathOnBucketS3 { get; set; }
     }
 }

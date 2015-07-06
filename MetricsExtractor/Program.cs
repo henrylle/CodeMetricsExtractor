@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using ArchiMetrics.Analysis;
 using ArchiMetrics.Common;
 using ArchiMetrics.Common.Metrics;
+using MetricsExtractor.Core.Integration.Abstract;
+using MetricsExtractor.Core.Integration.Concrete;
 using MetricsExtractor.Custom;
 using MetricsExtractor.ReportTemplate;
 using Microsoft.CodeAnalysis.Options;
@@ -30,8 +32,9 @@ namespace MetricsExtractor
 
             var metricConfiguration = DashedParameterSerializer.Deserialize<MetricConfiguration>(args);
 
-            if (metricConfiguration.destinationReportPath != null && !Directory.Exists(metricConfiguration.destinationReportPath))
+            if (metricConfiguration.DestinationReportPath != null && !Directory.Exists(metricConfiguration.DestinationReportPath))
                 throw new DirectoryNotFoundException("Destination Report Path not found.");
+
 
             var runCodeMetrics = RunCodeMetrics(metricConfiguration);
             runCodeMetrics.Wait();
@@ -49,18 +52,42 @@ namespace MetricsExtractor
 
             var resultadoGeral = CreateEstadoDoProjeto(types, metodosRuins, metodos.Count, namespaceMetrics);
 
-            var reportPath = GenerateReport(resultadoGeral, metricConfiguration.destinationReportPath ?? metricConfiguration.SolutionDirectory);
+            var reportPath = GenerateReport(resultadoGeral, metricConfiguration.DestinationReportPath ?? metricConfiguration.SolutionDirectory);
 
             Console.WriteLine("Report generated in: {0}", reportPath);
 
-            if (metricConfiguration.openReport.GetValueOrDefault(false))
+            #region Send to S3
+            if (metricConfiguration.SendToS3.GetValueOrDefault(false))
+            {
+                IAmazonS3Integration amazonS3Integration = null;
+                if (metricConfiguration.AwsAccessKey == null)
+                    throw new ArgumentNullException("AwsAccessKey", "When SendToS3 is true, AwsAccesskey is required");
+                if (metricConfiguration.AwsSecretKey == null)
+                    throw new ArgumentNullException("AwsSecretKey", "When SendToS3 is true, AwsSecretKey is required");
+                if (metricConfiguration.BucketS3 == null)
+                    throw new ArgumentNullException("BucketS3", "When SendToS3 is true, BucketS3 is required");
+                if (metricConfiguration.PathOnBucketS3 == null)
+                    throw new ArgumentNullException("PathOnBucketS3", "When SendToS3 is true, PathOnBucketS3 is required");
+
+                amazonS3Integration = new AmazonS3Integration(metricConfiguration.AwsAccessKey, metricConfiguration.AwsSecretKey);
+                var pathOnS3 = Path.Combine(string.Format("{0}/metrics-{1}", metricConfiguration.PathOnBucketS3, string.Format("-{0:yy-MM-dd_HH-mm}", DateTime.Now)));
+
+                amazonS3Integration.SendDocument(reportPath, metricConfiguration.BucketS3, pathOnS3);
+            }
+
+            #endregion
+
+
+            if (metricConfiguration.OpenReport.GetValueOrDefault(false))
                 Process.Start(reportPath);
         }
 
-        private static string GenerateReport(EstadoDoProjeto resultadoGeral, string solutionDirectory)
+        private static string GenerateReport(EstadoDoProjeto resultadoGeral, string solutionDirectory, bool namedDateToDirectory = true)
         {
-            var reportDirectory = Path.Combine(solutionDirectory, "CodeMetricsReport");
-            var reportPath = Path.Combine(reportDirectory, "CodeMetricsReport.zip");
+            var reportDirectory = Path.Combine(solutionDirectory, string.Format("{0}{1}", "CodeMetricsReport",
+                namedDateToDirectory ? string.Format("-{0:yy-MM-dd--HH-mm}", DateTime.Now) : ""));
+            var reportPath = Path.Combine(reportDirectory, string.Format("{0}{1}", "CodeMetricsReport.zip",
+                namedDateToDirectory ? string.Format("-{0:yy-MM-dd--HH-mm}", DateTime.Now) : ""));
 
             var reportTemplateFactory = new ReportTemplateFactory();
             var report = reportTemplateFactory.GetReport(resultadoGeral);

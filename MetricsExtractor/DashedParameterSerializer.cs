@@ -22,6 +22,8 @@ namespace MetricsExtractor
                 {
                     if (currentPropertyInfo.PropertyType.IsArray)
                         currentPropertyInfo.SetValue(instance, parameter.Split(';'));
+                    else if (currentPropertyInfo.PropertyType == typeof(bool) || currentPropertyInfo.PropertyType == typeof(bool?))
+                        currentPropertyInfo.SetValue(instance, bool.Parse(parameter));
                     else
                         currentPropertyInfo.SetValue(instance, parameter);
                 }

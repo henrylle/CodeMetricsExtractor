@@ -130,6 +130,10 @@
       <Project>{d8be9d36-ec03-4eee-91da-f9d8c9fd11d2}</Project>
       <Name>ArchiMetrics.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\MetricsExtractor.Core\MetricsExtractor.Core.csproj">
+      <Project>{03f3b331-b1cb-4627-8165-1b548e00c78a}</Project>
+      <Name>MetricsExtractor.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
