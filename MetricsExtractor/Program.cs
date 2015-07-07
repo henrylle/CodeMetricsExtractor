@@ -70,7 +70,7 @@ namespace MetricsExtractor
                     throw new ArgumentNullException("PathOnBucketS3", "When SendToS3 is true, PathOnBucketS3 is required");
 
                 amazonS3Integration = new AmazonS3Integration(metricConfiguration.AwsAccessKey, metricConfiguration.AwsSecretKey);
-                var pathOnS3 = Path.Combine(string.Format("{0}/metrics-{1}", metricConfiguration.PathOnBucketS3, string.Format("-{0:yy-MM-dd_HH-mm}", DateTime.Now)));
+                var pathOnS3 = Path.Combine(string.Format("{0}/metrics-{1}", metricConfiguration.PathOnBucketS3, string.Format("{0:yy-MM-dd_HH-mm}", DateTime.Now)));
 
                 amazonS3Integration.SendDocument(reportPath, metricConfiguration.BucketS3, pathOnS3);
             }
@@ -85,9 +85,9 @@ namespace MetricsExtractor
         private static string GenerateReport(EstadoDoProjeto resultadoGeral, string solutionDirectory, bool namedDateToDirectory = true)
         {
             var reportDirectory = Path.Combine(solutionDirectory, string.Format("{0}{1}", "CodeMetricsReport",
-                namedDateToDirectory ? string.Format("-{0:yy-MM-dd--HH-mm}", DateTime.Now) : ""));
-            var reportPath = Path.Combine(reportDirectory, string.Format("{0}{1}", "CodeMetricsReport.zip",
-                namedDateToDirectory ? string.Format("-{0:yy-MM-dd--HH-mm}", DateTime.Now) : ""));
+                namedDateToDirectory ? string.Format("-{0:yy-MM-dd-HH-mm}", DateTime.Now) : ""));
+            var reportPath = Path.Combine(reportDirectory, string.Format("{0}{1}.zip", "CodeMetricsReport",
+                namedDateToDirectory ? string.Format("-{0:yy-MM-dd-HH-mm}", DateTime.Now) : ""));
 
             var reportTemplateFactory = new ReportTemplateFactory();
             var report = reportTemplateFactory.GetReport(resultadoGeral);
@@ -101,18 +101,14 @@ namespace MetricsExtractor
                 {
                     var fileName = Path.GetFileName(item);
                     zipArchive.CreateEntryFromFile(item, fileName);
-#if DEBUG
                     File.Copy(item, Path.Combine(reportDirectory, fileName), true);
-#endif
                 }
                 var archiveEntry = zipArchive.CreateEntry("Index.html");
                 using (var stream = archiveEntry.Open())
                 using (var streamWriter = new StreamWriter(stream, Encoding.UTF8))
                     streamWriter.Write(report);
-#if DEBUG
                 reportPath = Path.Combine(reportDirectory, "Index.html");
-                File.WriteAllText(reportPath, report, Encoding.UTF8);
-#endif
+                File.WriteAllText(reportPath, report, Encoding.UTF8);                
                 zipArchive.Dispose();
             }
             return reportPath;
