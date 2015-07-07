@@ -58,7 +58,7 @@ metricsextractor.exe -solution solutionpath.sln -ignoredtypes "Namespace.Core.Pe
 ````
 
 #### DestinationReportPath (*New*)
-You can change default destination to report. You must split them by "**;**"
+You can change default destination to report.
 
 Example:
 
@@ -68,10 +68,27 @@ metricsextractor.exe -solution solutionpath.sln -destinationreportpath "C:\Repor
 
 #### OpenReport (*New*)
 
-You can set to report open on your default browser after finish. Default is **false**. You must split them by "**;**"
+You can set to report open on your default browser after finish. Default is **false**.
 
 Example:
 
 ````
 metricsextractor.exe -solution solutionpath.sln -openreport "true"
+````
+
+#### SendToS3 (*New*)
+
+You can send the 'index.html' generated to S3 bucket on AWS. When set SendToS3 to **true**, another parameters are required. If not send these parameters, 
+an ArgumentNullException will happen.
+
+*Another parameters*:
+- AwsAccessKey: Access Key with permission to put and read on bucket destination.
+- AwsSecretKey: Secret Key.
+- BucketS3: Bucket to send html.
+- PathOnBucketS3: Virtual directory within bucket.
+
+Example:
+
+````
+metricsextractor.exe -solution solutionpath.sln -sendtos3 "true" -awsaccesskey "YOUR_ACCESS_KEY" -awssecretkey "YOUR_SECRET_KEY" -buckets3 "YOUR_BUCKET" -PathOnBucketS3 "metrics"
 ````

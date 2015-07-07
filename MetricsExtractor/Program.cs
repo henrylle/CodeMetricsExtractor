@@ -22,12 +22,12 @@ namespace MetricsExtractor
         private static readonly List<ClassRank> ClassRanks = Enum.GetValues(typeof(ClassRank)).Cast<ClassRank>().ToList();
         private static readonly string ApplicationPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
 
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
             if (!args.Any())
             {
                 Console.WriteLine("No solution configured");
-                return;
+                return 0;
             }
 
             var metricConfiguration = DashedParameterSerializer.Deserialize<MetricConfiguration>(args);
@@ -80,6 +80,8 @@ namespace MetricsExtractor
 
             if (metricConfiguration.OpenReport.GetValueOrDefault(false))
                 Process.Start(reportPath);
+            
+            return resultadoGeral.Manutenibilidade;
         }
 
         private static string GenerateReport(EstadoDoProjeto resultadoGeral, string solutionDirectory, bool namedDateToDirectory = true)
