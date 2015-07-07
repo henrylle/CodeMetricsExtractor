@@ -52,7 +52,9 @@ namespace MetricsExtractor
 
             var resultadoGeral = CreateEstadoDoProjeto(types, metodosRuins, metodos.Count, namespaceMetrics);
 
-            var reportPath = GenerateReport(resultadoGeral, metricConfiguration.DestinationReportPath ?? metricConfiguration.SolutionDirectory);
+            var reportDirectory = Path.Combine(metricConfiguration.DestinationReportPath ?? metricConfiguration.SolutionDirectory, string.Format("{0}{1}", "CodeMetricsReport", string.Format("-{0:yy-MM-dd-HH-mm}", DateTime.Now)));
+
+            var reportPath = GenerateReport(resultadoGeral, reportDirectory);
 
             Console.WriteLine("Report generated in: {0}", reportPath);
 
@@ -73,6 +75,7 @@ namespace MetricsExtractor
                 var pathOnS3 = Path.Combine(string.Format("{0}/metrics-{1}", metricConfiguration.PathOnBucketS3, string.Format("{0:yy-MM-dd_HH-mm}", DateTime.Now)));
 
                 amazonS3Integration.SendDocument(reportPath, metricConfiguration.BucketS3, pathOnS3);
+                amazonS3Integration.SendDocument(string.Format(@"{0}\site.css", reportDirectory), metricConfiguration.BucketS3, pathOnS3, "site.css", true);
             }
 
             #endregion
@@ -80,16 +83,14 @@ namespace MetricsExtractor
 
             if (metricConfiguration.OpenReport.GetValueOrDefault(false))
                 Process.Start(reportPath);
-            
+
             return resultadoGeral.Manutenibilidade;
         }
 
-        private static string GenerateReport(EstadoDoProjeto resultadoGeral, string solutionDirectory, bool namedDateToDirectory = true)
+        private static string GenerateReport(EstadoDoProjeto resultadoGeral, string reportDirectory)
         {
-            var reportDirectory = Path.Combine(solutionDirectory, string.Format("{0}{1}", "CodeMetricsReport",
-                namedDateToDirectory ? string.Format("-{0:yy-MM-dd-HH-mm}", DateTime.Now) : ""));
-            var reportPath = Path.Combine(reportDirectory, string.Format("{0}{1}.zip", "CodeMetricsReport",
-                namedDateToDirectory ? string.Format("-{0:yy-MM-dd-HH-mm}", DateTime.Now) : ""));
+
+            var reportPath = Path.Combine(reportDirectory, string.Format("{0}{1}.zip", "CodeMetricsReport", string.Format("-{0:yy-MM-dd-HH-mm}", DateTime.Now)));
 
             var reportTemplateFactory = new ReportTemplateFactory();
             var report = reportTemplateFactory.GetReport(resultadoGeral);
@@ -110,7 +111,7 @@ namespace MetricsExtractor
                 using (var streamWriter = new StreamWriter(stream, Encoding.UTF8))
                     streamWriter.Write(report);
                 reportPath = Path.Combine(reportDirectory, "Index.html");
-                File.WriteAllText(reportPath, report, Encoding.UTF8);                
+                File.WriteAllText(reportPath, report, Encoding.UTF8);
                 zipArchive.Dispose();
             }
             return reportPath;

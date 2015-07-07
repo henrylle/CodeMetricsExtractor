@@ -17,7 +17,7 @@ namespace MetricsExtractor.Core.Integration.Concrete
             amazonS3Client = new AmazonS3Client(accessKey, secretKey, RegionEndpoint.USEast1);
         }
 
-        public void SendDocument(string filePath, string bucket, string destinationPath, string fileNamOnDestinationWithExtension = "index.html")
+        public void SendDocument(string filePath, string bucket, string destinationPath, string fileNamOnDestinationWithExtension = "index.html", bool isPublic = false)
         {
             try
             {
@@ -31,6 +31,8 @@ namespace MetricsExtractor.Core.Integration.Concrete
                     Key = string.Format("{0}/{1}", destinationPath, fileNamOnDestinationWithExtension),
                     FilePath = filePath
                 };
+                if (isPublic)
+                    request.Headers["x-amz-acl"] = "public-read";
                 request.UploadProgressEvent += uploadFileProgressCallback;
 
                 transferUtility.Upload(request);
@@ -39,6 +41,31 @@ namespace MetricsExtractor.Core.Integration.Concrete
             catch (Exception ex)
             {
                 throw new Exception("Error send file to S3. " + ex.Message);
+            }
+        }
+
+        public void SendDirectory(string directory, string bucket, string destinationPath)
+        {
+            try
+            {
+                var transferUtility = new TransferUtility(amazonS3Client);
+                if (!transferUtility.S3Client.DoesS3BucketExist(bucket))
+                    transferUtility.S3Client.PutBucket(new PutBucketRequest { BucketName = bucket });
+
+                var request = new TransferUtilityUploadDirectoryRequest()
+                {
+                    BucketName = bucket,
+                    Directory = directory,
+                    KeyPrefix = destinationPath
+                };
+                request.UploadDirectoryProgressEvent += uploadDirectoryProgressCallback;
+
+                transferUtility.UploadDirectory(request);
+                transferUtility.Dispose();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error send directory to S3. " + ex.Message);
             }
         }
 
@@ -57,6 +84,11 @@ namespace MetricsExtractor.Core.Integration.Concrete
         }
 
         private void uploadFileProgressCallback(object sender, UploadProgressArgs e)
+        {
+            Console.WriteLine("Total bytes: {0} - Total sent: {1}", e.TotalBytes, e.TransferredBytes);
+        }
+
+        private void uploadDirectoryProgressCallback(object sender, UploadDirectoryProgressArgs e)
         {
             Console.WriteLine("Total bytes: {0} - Total sent: {1}", e.TotalBytes, e.TransferredBytes);
         }

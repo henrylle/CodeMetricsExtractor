@@ -78,7 +78,7 @@ metricsextractor.exe -solution solutionpath.sln -openreport "true"
 
 #### SendToS3 (*New*)
 
-You can send the 'index.html' generated to S3 bucket on AWS. When set SendToS3 to **true**, another parameters are required. If not send these parameters, 
+You can send the 'index.html' and 'site.css'(*) (local dependence) generated, to S3 bucket on AWS. When set SendToS3 to **true**, another parameters are required. If not send these parameters, 
 an ArgumentNullException will happen.
 
 *Another parameters*:
@@ -86,6 +86,8 @@ an ArgumentNullException will happen.
 - AwsSecretKey: Secret Key.
 - BucketS3: Bucket to send html.
 - PathOnBucketS3: Virtual directory within bucket.
+
+*(\*) Site.css is defined with public access for default on S3.*
 
 Example:
 
