@@ -68,7 +68,7 @@ metricsextractor.exe -solution solutionpath.sln -destinationreportpath "C:\Repor
 
 #### OpenReport (*New*)
 
-You can set to report open on your default browser after finish. Default is ***false**. You must split them by "**;**"
+You can set to report open on your default browser after finish. Default is **false**. You must split them by "**;**"
 
 Example:
 
