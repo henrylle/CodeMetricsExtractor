@@ -104,7 +104,7 @@ an ArgumentNullException will happen.
 - SendToS3: Configuration to send html report to S3. View above topic about SendToS3.
 - SlackToken: Token authorized to post message on channel.
 - SlackChannel: Channel to post message.
-- SlackMessage: Message to post. Ex: **-slackmessage "Link to metrics is: "**. Result on Slack: **Link to metrics is**: http://SIGNED_S3_URL. Link expire at 11/07/2015 10:59:07* 
+- SlackMessage: Message to post. Ex: **-slackmessage "Link to metrics is: "**. Result on Slack: ** *Link to metrics is**: http://SIGNED_S3_URL. Link expire at 11/07/2015 10:59:07* 
 - SlackUserName: Bot Name. 
 
 *Parameters (optional)*:
