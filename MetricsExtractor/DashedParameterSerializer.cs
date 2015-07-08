@@ -24,6 +24,8 @@ namespace MetricsExtractor
                         currentPropertyInfo.SetValue(instance, parameter.Split(';'));
                     else if (currentPropertyInfo.PropertyType == typeof(bool) || currentPropertyInfo.PropertyType == typeof(bool?))
                         currentPropertyInfo.SetValue(instance, bool.Parse(parameter));
+                    else if (currentPropertyInfo.PropertyType == typeof(int) || currentPropertyInfo.PropertyType == typeof(int?))
+                        currentPropertyInfo.SetValue(instance, int.Parse(parameter));
                     else
                         currentPropertyInfo.SetValue(instance, parameter);
                 }

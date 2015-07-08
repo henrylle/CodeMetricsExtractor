@@ -4,13 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{03F3B331-B1CB-4627-8165-1B548E00C78A}</ProjectGuid>
+    <ProjectGuid>{255A40B6-F331-4883-9D3A-81613C1F2BBB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MetricsExtractor.Core</RootNamespace>
-    <AssemblyName>MetricsExtractor.Core</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <RootNamespace>MetricsExtractor.Test</RootNamespace>
+    <AssemblyName>MetricsExtractor.Test</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,16 +31,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AWSSDK.Core">
-      <HintPath>..\packages\AWSSDK.Core.3.0.0.2-preview\lib\net45\AWSSDK.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="AWSSDK.S3">
-      <HintPath>..\packages\AWSSDK.S3.3.0.0.3-preview\lib\net45\AWSSDK.S3.dll</HintPath>
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -47,14 +43,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Integration\Abstract\IAmazonS3Integration.cs" />
-    <Compile Include="Integration\Abstract\ISlackIntegration.cs" />
-    <Compile Include="Integration\Concrete\AmazonS3Integration.cs" />
-    <Compile Include="Integration\Concrete\SlackIntegration.cs" />
+    <Compile Include="Core\SlackIntegrationTest.cs" />
+    <Compile Include="DashedParameterSerializerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MetricsExtractor.Core\MetricsExtractor.Core.csproj">
+      <Project>{03f3b331-b1cb-4627-8165-1b548e00c78a}</Project>
+      <Name>MetricsExtractor.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MetricsExtractor\MetricsExtractor.csproj">
+      <Project>{9dc6404c-b685-4733-acb0-94504fd05e64}</Project>
+      <Name>MetricsExtractor</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -25,12 +25,24 @@ namespace MetricsExtractor
 
         public bool? SendToS3 { get; set; }
 
-        public string  AwsAccessKey { get; set; }
+        public string AwsAccessKey { get; set; }
 
         public string AwsSecretKey { get; set; }
 
         public string BucketS3 { get; set; }
 
         public string PathOnBucketS3 { get; set; }
+
+        public bool? SendSignedUrlToSlack { get; set; }
+
+        public int? SlackUrlExpirationInSeconds { get; set; }
+
+        public string SlackToken { get; set; }
+
+        public string SlackChannel { get; set; }
+
+        public string SlackMessage { get; set; }
+
+        public string SlackUserName { get; set; }
     }
 }

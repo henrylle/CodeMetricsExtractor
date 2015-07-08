@@ -87,10 +87,32 @@ an ArgumentNullException will happen.
 - BucketS3: Bucket to send html.
 - PathOnBucketS3: Virtual directory within bucket.
 
-*(\*) Site.css is defined with public access for default on S3.*
+*(\*) Site.css is defined with public access for default on S3, but to access 'index.html' is necessary signed url.*
 
 Example:
 
 ````
 metricsextractor.exe -solution solutionpath.sln -sendtos3 "true" -awsaccesskey "YOUR_ACCESS_KEY" -awssecretkey "YOUR_SECRET_KEY" -buckets3 "YOUR_BUCKET" -PathOnBucketS3 "metrics"
+````
+
+#### SendSignedUrlToSlack (*New*)
+
+You can send the signed url on S3 to Slack (index.html), included site.css (local dependence). When set SendSignedUrlToSlack to **true**, another parameters are required like **SendToS3**. If not send these parameters, 
+an ArgumentNullException will happen.
+
+*Parameters (required)*:
+- SendToS3: Configuration to send html report to S3. View above topic about SendToS3.
+- SlackToken: Token authorized to post message on channel.
+- SlackChannel: Channel to post message.
+- SlackMessage: Message to post. Ex: **-slackmessage "Link to metrics is: "**. Result on Slack: ***Link to metrics is**: http://SIGNED_S3_URL. Link expire at 11/07/2015 10:59:07* 
+- SlackUserName: Bot Name. 
+
+*Parameters (optional)*:
+- SlackUrlExpirationInSeconds: Date expiration link on S3 to Send Slack. Default is 24h (86400 seconds).
+
+Example:
+
+````
+metricsextractor.exe -solution solutionpath.sln -sendtos3 "true" -awsaccesskey "YOUR_ACCESS_KEY" -awssecretkey "YOUR_SECRET_KEY" -buckets3 "YOUR_BUCKET" -PathOnBucketS3 "metrics" 
+-SendSignedUrlToSlack "true" -slacktoken "YOUR_SLACK_TOKEN" -slackchannel "#your_channel" -slackMessage "Link to metrics is: " -slackusername "any_bot_name" -SlackUrlExpirationInSeconds "259200"
 ````

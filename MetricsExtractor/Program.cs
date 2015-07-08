@@ -59,32 +59,75 @@ namespace MetricsExtractor
             Console.WriteLine("Report generated in: {0}", reportPath);
 
             #region Send to S3
+            var pathOnS3 = "";
             if (metricConfiguration.SendToS3.GetValueOrDefault(false))
             {
-                IAmazonS3Integration amazonS3Integration = null;
-                if (metricConfiguration.AwsAccessKey == null)
-                    throw new ArgumentNullException("AwsAccessKey", "When SendToS3 is true, AwsAccesskey is required");
-                if (metricConfiguration.AwsSecretKey == null)
-                    throw new ArgumentNullException("AwsSecretKey", "When SendToS3 is true, AwsSecretKey is required");
-                if (metricConfiguration.BucketS3 == null)
-                    throw new ArgumentNullException("BucketS3", "When SendToS3 is true, BucketS3 is required");
-                if (metricConfiguration.PathOnBucketS3 == null)
-                    throw new ArgumentNullException("PathOnBucketS3", "When SendToS3 is true, PathOnBucketS3 is required");
-
-                amazonS3Integration = new AmazonS3Integration(metricConfiguration.AwsAccessKey, metricConfiguration.AwsSecretKey);
-                var pathOnS3 = Path.Combine(string.Format("{0}/metrics-{1}", metricConfiguration.PathOnBucketS3, string.Format("{0:yy-MM-dd_HH-mm}", DateTime.Now)));
-
-                amazonS3Integration.SendDocument(reportPath, metricConfiguration.BucketS3, pathOnS3);
-                amazonS3Integration.SendDocument(string.Format(@"{0}\site.css", reportDirectory), metricConfiguration.BucketS3, pathOnS3, "site.css", true);
+                SendToS3(metricConfiguration, reportPath, reportDirectory, out pathOnS3);
             }
-
             #endregion
 
+            #region Send Sign Url to Slack
+            if (metricConfiguration.SendSignedUrlToSlack.GetValueOrDefault(false))
+            {
+                SendToSlack(metricConfiguration, pathOnS3);
+            }
+            #endregion
 
             if (metricConfiguration.OpenReport.GetValueOrDefault(false))
                 Process.Start(reportPath);
 
             return resultadoGeral.Manutenibilidade;
+        }
+
+        private static void SendToS3(MetricConfiguration metricConfiguration, string reportPath, string reportDirectory, out string pathOnS3)
+        {
+            IAmazonS3Integration amazonS3Integration = null;
+            if (metricConfiguration.AwsAccessKey == null)
+                throw new ArgumentNullException("AwsAccessKey", "When SendToS3 is true, AwsAccesskey is required");
+            if (metricConfiguration.AwsSecretKey == null)
+                throw new ArgumentNullException("AwsSecretKey", "When SendToS3 is true, AwsSecretKey is required");
+            if (metricConfiguration.BucketS3 == null)
+                throw new ArgumentNullException("BucketS3", "When SendToS3 is true, BucketS3 is required");
+            if (metricConfiguration.PathOnBucketS3 == null)
+                throw new ArgumentNullException("PathOnBucketS3", "When SendToS3 is true, PathOnBucketS3 is required");
+
+            amazonS3Integration = new AmazonS3Integration(metricConfiguration.AwsAccessKey, metricConfiguration.AwsSecretKey);
+            pathOnS3 = Path.Combine(string.Format("{0}/metrics-{1}", metricConfiguration.PathOnBucketS3, string.Format("{0:yy-MM-dd_HH-mm}", DateTime.Now)));
+            amazonS3Integration.SendDocument(reportPath, metricConfiguration.BucketS3, pathOnS3);
+            amazonS3Integration.SendDocument(string.Format(@"{0}\site.css", reportDirectory), metricConfiguration.BucketS3, pathOnS3, "site.css", true);
+        }
+
+        private static void SendToSlack(MetricConfiguration metricConfiguration, string pathOnS3)
+        {
+            ISlackIntegration slackIntegration = null;
+            IAmazonS3Integration amazonS3Integration = null;
+
+            if (metricConfiguration.SlackChannel == null)
+                throw new ArgumentNullException("SendToS3", "When SendSignUrlToSlack is true, SendToS3 enabled is required");
+            if (metricConfiguration.SlackChannel == null)
+                throw new ArgumentNullException("SlackChannel", "When SendSignUrlToSlack is true, SlackChannel is required");
+            if (metricConfiguration.SlackMessage == null)
+                throw new ArgumentNullException("SlackMessage", "When SendSignUrlToSlack is true, SlackMessage is required");
+            if (metricConfiguration.SlackToken == null)
+                throw new ArgumentNullException("SlackToken", "When SendSignUrlToSlack is true, SlackToken is required");
+            if (metricConfiguration.SlackUserName == null)
+                throw new ArgumentNullException("SlackUserName", "When SendSignUrlToSlack is true, SlackUserName is required");
+
+            amazonS3Integration = new AmazonS3Integration(metricConfiguration.AwsAccessKey, metricConfiguration.AwsSecretKey);
+            var signedUrl = amazonS3Integration.SignUrl(pathOnS3, "index.html", metricConfiguration.BucketS3,
+                metricConfiguration.SlackUrlExpirationInSeconds.GetValueOrDefault(86400));
+
+            var dtExpirationLink =
+                DateTime.Now.AddSeconds(metricConfiguration.SlackUrlExpirationInSeconds.GetValueOrDefault(86400));
+
+            Console.WriteLine("Signed Url Metrics Report generated. Date Expiration: {0:u}.", dtExpirationLink);
+
+            slackIntegration = new SlackIntegration(metricConfiguration.SlackToken);
+            slackIntegration.PostMessage(metricConfiguration.SlackChannel, string.Format("{0}{1}. Link expire at {2}: ", metricConfiguration.SlackMessage, signedUrl, dtExpirationLink),
+                metricConfiguration.SlackUserName);
+
+
+            Console.WriteLine("Link Url Metrics Report sent to Slack: {0}. Dt Expiration", signedUrl);
         }
 
         private static string GenerateReport(EstadoDoProjeto resultadoGeral, string reportDirectory)
